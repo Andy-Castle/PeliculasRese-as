@@ -3,7 +3,8 @@ import strawberry_django
 from typing import List
 from .types import MovieType, ReviewType, GenreType
 from .models import Movie, Review, Genre
-from .inputs import MovieInput, ReviewInput, GenreInput
+from .inputs import MovieInput, ReviewInput, GenreInput, MovieUpdate, ReviewUpdate, GenreUpdate
+from dataclasses import asdict
 from django.db import connection
 
 @strawberry.type
@@ -25,8 +26,9 @@ class Query:
             return [row[0] for row in rows]
         
 
+#Los crud
 @strawberry.type
-class Mutation:
+class Mutations:
     @strawberry.mutation
     def create_genre(self, input: GenreInput) -> GenreType:
         genre = Genre.objects.create(name=input.name)
@@ -52,3 +54,15 @@ class Mutation:
             movies_id=input.movie_id
         )
         return review
+    
+    
+    @strawberry.mutation
+    def update_movie(self, movie_id: int, data: MovieUpdate) -> MovieType:
+        try:
+            movie = Movie.objects.get(id=movie_id)
+            for key, value in asdict(data).items():
+                setattr(movie, key, value)
+            
+            movie.save()
+        except Movie.DoesNotExist:
+            raise Exception("Not found")

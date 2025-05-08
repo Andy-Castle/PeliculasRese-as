@@ -1,4 +1,4 @@
 import strawberry
-from .resolvers import Query, Mutation
+from .resolvers import Query, Mutations
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(query=Query, mutation= Mutations)
